@@ -97,6 +97,27 @@ class User extends ActiveRecord implements IdentityInterface
         return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
 
+    public static function sendUser($login){
+
+        if ($login){
+            $user = User::findOne(['id' => Yii::$app->user->id]);
+            $user->token = Yii::$app->security->generateRandomString(64);
+            $user->save();
+            unset($user['password_hash']);
+            unset($user['password']);
+            unset($user['password_reset_token']);
+            unset($user['auth_key']);
+            return $user;
+        }
+
+        $identity = Yii::$app->user->identity;
+        unset($identity['password_hash']);
+        unset($identity['password']);
+        unset($identity['password_reset_token']);
+        unset($identity['auth_key']);
+        return $identity;
+    }
+
     /**
      * {@inheritdoc}
      */

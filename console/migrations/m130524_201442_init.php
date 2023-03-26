@@ -36,9 +36,9 @@ class m130524_201442_init extends Migration
         ], $tableOptions);
 
         $this->insert('user',[
-            'username' => 'upgo-admin-kgh',
-            'password_hash' => Yii::$app->security->generatePasswordHash('upgo-admin-kgh-123'),
-            'password' => 'upgo-admin-kgh-123',
+            'username' => '+998907291129',
+            'password_hash' => Yii::$app->security->generatePasswordHash('+998907291129'),
+            'password' => '+998907291129',
             'token' => Yii::$app->security->generateRandomString(),
             'auth_key' => Yii::$app->security->generateRandomString(),
             'role' => User::ROLE_ADMIN,
