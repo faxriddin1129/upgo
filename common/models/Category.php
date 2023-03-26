@@ -46,7 +46,9 @@ class Category extends \yii\db\ActiveRecord
     {
         return [
             [['created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
+            [['name'], 'unique', 'targetClass' => '\common\models\Category', 'message' => 'This category has already been taken.'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updated_by' => 'id']],
         ];
@@ -95,5 +97,46 @@ class Category extends \yii\db\ActiveRecord
     public function getUpdatedBy()
     {
         return $this->hasOne(User::class, ['id' => 'updated_by']);
+    }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'name',
+        ];
+    }
+
+    public function extraFields()
+    {
+        return [
+            'owner' => function($model){
+                return [
+                    'created_by' => [
+                        'user_id' => $model->created_by,
+                        'phone' => $model->createdBy->username,
+                    ],
+                    'updated_by' => [
+                        'user_id' => $model->updated_by,
+                        'phone' => $model->updatedBy->username,
+                    ],
+                ];
+            },
+            'time' => function($model){
+                return [
+                    'created_at' => [
+                        'time' => $model->created_at,
+                        'format' => date('Y-m-d H:i', $model->created_at),
+                    ],
+                    'updated_at' => [
+                        'time' => $model->updated_at,
+                        'format' => date('Y-m-d H:i', $model->updated_at),
+                    ],
+                ];
+            },
+            'product' => function($model){
+                return $model->products;
+            }
+        ];
     }
 }
