@@ -3,7 +3,6 @@
 namespace common\models;
 
 use Yii;
-use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -18,6 +17,9 @@ use yii\web\IdentityInterface;
  * @property string $verification_token
  * @property string $email
  * @property string $auth_key
+ * @property string $role
+ * @property string $token
+ * @property string $parent_id
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
@@ -28,6 +30,10 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
+
+    const ROLE_ADMIN = 0;
+    const ROLE_AGENT = 1;
+    const ROLE_SUP_AGENT = 2;
 
 
     /**
@@ -48,6 +54,28 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
+    public static function dropdownRole(){
+
+        return [
+            self::ROLE_ADMIN => 'Admin',
+            self::ROLE_AGENT => 'Agent',
+            self::ROLE_SUP_AGENT => 'SubAgent',
+        ];
+
+    }
+
+    public static function dropdownStatus(){
+
+        return [
+            self::STATUS_ACTIVE => 'Active',
+            self::STATUS_INACTIVE => 'InActive',
+            self::STATUS_DELETED => 'Deleted',
+        ];
+
+    }
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -56,6 +84,8 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            [['password'], 'string'],
+            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['parent_id' => 'id']],
         ];
     }
 
@@ -72,7 +102,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        return static::findOne(['token' => $token]);
     }
 
     /**

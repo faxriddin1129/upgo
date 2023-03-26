@@ -52,7 +52,6 @@ abstract class CrudController extends ApiController
                 ],
                 'languages' => [
                     'ru',
-                    'en',
                     'uz',
                 ],
                 'formatParam' => '_f',

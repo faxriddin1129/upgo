@@ -1,5 +1,6 @@
 <?php
 
+use common\models\User;
 use yii\db\Migration;
 
 class m130524_201442_init extends Migration
@@ -12,22 +13,78 @@ class m130524_201442_init extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
 
+        $this->createTable('{{%file}}',[
+            'id' => $this->primaryKey(),
+            'url' => $this->text(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer()
+        ]);
+
         $this->createTable('{{%user}}', [
             'id' => $this->primaryKey(),
             'username' => $this->string()->notNull()->unique(),
             'auth_key' => $this->string(32)->notNull(),
             'password_hash' => $this->string()->notNull(),
+            'password' => $this->string()->notNull(),
             'password_reset_token' => $this->string()->unique(),
-            'email' => $this->string()->notNull()->unique(),
-
+            'token' => $this->string()->notNull()->unique(),
+            'role' => $this->smallInteger(),
             'status' => $this->smallInteger()->notNull()->defaultValue(10),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
+            'parent_id' => $this->integer()
         ], $tableOptions);
+
+        $this->insert('user',[
+            'username' => 'upgo-admin-kgh',
+            'password_hash' => Yii::$app->security->generatePasswordHash('upgo-admin-kgh-123'),
+            'password' => 'upgo-admin-kgh-123',
+            'token' => Yii::$app->security->generateRandomString(),
+            'auth_key' => Yii::$app->security->generateRandomString(),
+            'role' => User::ROLE_ADMIN,
+            'status' => User::STATUS_ACTIVE,
+            'created_at' => time(),
+            'updated_at' => time(),
+        ]);
+
+        // creates index for column `user_id`
+        $this->createIndex(
+            '{{%idx-user-parent_id}}',
+            '{{%user}}',
+            'parent_id'
+        );
+
+        // add foreign key for table `{{%user}}`
+        $this->addForeignKey(
+            '{{%fk-user-parent_id}}',
+            '{{%user}}',
+            'parent_id',
+            '{{%user}}',
+            'id',
+            'CASCADE'
+        );
+
     }
+
+
 
     public function down()
     {
+
+        // drops foreign key for table `{{%user}}`
+        $this->dropForeignKey(
+            '{{%fk-user_parent_id}}',
+            '{{%user}}'
+        );
+
+        // drops index for column `user_id`
+        $this->dropIndex(
+            '{{%idx-user-parent_id}}',
+            '{{%user}}'
+        );
+
         $this->dropTable('{{%user}}');
+
+        $this->dropTable('{{%file}}');
     }
 }

@@ -36,9 +36,7 @@ class Module extends \yii\base\Module
         $behaviors['authenticator'] = [
             'class' => CompositeAuth::class,
             'except' => [
-                'user/sign-up',
-                'user/confirm',
-                'user/send-sms',
+                'user/sign-in',
                 '*/options',
             ],
             'optional' => [
