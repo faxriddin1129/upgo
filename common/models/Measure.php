@@ -46,7 +46,9 @@ class Measure extends \yii\db\ActiveRecord
     {
         return [
             [['created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
+            [['name'], 'unique', 'targetClass' => '\common\models\Measure', 'message' => 'This measure has already been taken.'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updated_by' => 'id']],
         ];
