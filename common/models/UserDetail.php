@@ -16,6 +16,7 @@ use Yii;
  * @property int|null $file_id
  * @property float|null $salary_int
  * @property float|null $salary_percent
+ * @property float|null $legal_name
  *
  * @property File $file
  * @property User $user
@@ -38,7 +39,7 @@ class UserDetail extends \yii\db\ActiveRecord
         return [
             [['user_id', 'file_id'], 'integer'],
             [['salary_int', 'salary_percent'], 'number'],
-            [['first_name', 'last_name', 'middle_name', 'address'], 'string', 'max' => 255],
+            [['first_name', 'last_name', 'middle_name', 'address', 'legal_name'], 'string', 'max' => 255],
             [['file_id'], 'exist', 'skipOnError' => true, 'targetClass' => File::class, 'targetAttribute' => ['file_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -59,6 +60,7 @@ class UserDetail extends \yii\db\ActiveRecord
             'file_id' => Yii::t('app', 'File ID'),
             'salary_int' => Yii::t('app', 'Salary Int'),
             'salary_percent' => Yii::t('app', 'Salary Percent'),
+            'legal_name' => Yii::t('app', 'Legal Name'),
         ];
     }
 

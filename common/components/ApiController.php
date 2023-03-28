@@ -50,7 +50,6 @@ abstract class ApiController extends  Controller
                 ],
                 'languages' => [
                     'ru',
-                    'en',
                     'uz',
                 ],
                 'formatParam' => '_f',

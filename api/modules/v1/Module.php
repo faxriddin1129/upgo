@@ -10,6 +10,7 @@ use yii\filters\Cors;
 /**
  * v1 module definition class
  */
+
 class Module extends \yii\base\Module
 {
     /**
@@ -110,6 +111,24 @@ class Module extends \yii\base\Module
                 'OPTIONS <id:\d+>' => 'options',
                 'PUT <id:\d+>' => 'update',
                 'GET <id:\d+>' => 'view',
+            ]
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/diller',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'GET' => 'index',
+                'POST' => 'create',
+
+                'OPTIONS <id:\d+>' => 'options',
+                'GET <id:\d+>' => 'view',
+                'POST <id:\d+>' => 'status',
+                'PUT <id:\d+>' => 'update',
+
             ]
         ],
 

@@ -32,8 +32,8 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_ACTIVE = 10;
 
     const ROLE_ADMIN = 0;
-    const ROLE_AGENT = 1;
-    const ROLE_SUP_AGENT = 2;
+    const ROLE_DILLER = 1;
+    const ROLE_SUP_DILLER = 2;
 
 
     /**
@@ -58,8 +58,8 @@ class User extends ActiveRecord implements IdentityInterface
 
         return [
             self::ROLE_ADMIN => 'Admin',
-            self::ROLE_AGENT => 'Agent',
-            self::ROLE_SUP_AGENT => 'SubAgent',
+            self::ROLE_DILLER => 'Diller',
+            self::ROLE_SUP_DILLER => 'SubDiller',
         ];
 
     }
@@ -260,5 +260,34 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+
+    public function getUserDetail(){
+        return $this->hasMany(UserDetail::class, ['user_id' => 'id']);
+    }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'username',
+            'password',
+            'role',
+            'token',
+            'role_format' => function($model){
+                return User::dropdownRole()[$model->role];
+            },
+            'status',
+            'status_format' => function($model){
+                return User::dropdownStatus()[$model->status];
+            },
+            'created_at',
+            'updated_at',
+            'parent_id',
+            'detail' => function($model){
+                return $model->userDetail;
+            }
+        ];
     }
 }
