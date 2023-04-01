@@ -262,6 +262,9 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
+    public function getPermissions(){
+        return $this->hasMany(PermissionUser::class, ['user_id' => 'id']);
+    }
 
     public function getUserDetail(){
         return $this->hasMany(UserDetail::class, ['user_id' => 'id']);
@@ -287,6 +290,9 @@ class User extends ActiveRecord implements IdentityInterface
             'parent_id',
             'detail' => function($model){
                 return $model->userDetail;
+            },
+            'permissions' => function($model){
+                return $model->permissions;
             }
         ];
     }

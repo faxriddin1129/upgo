@@ -84,6 +84,20 @@ class Module extends \yii\base\Module
 
         [
             'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/user',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS get-me' => 'options',
+                'PUT get-me' => 'get-me',
+
+                'OPTIONS settings' => 'options',
+                'POST settings' => 'settings',
+            ]
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
             'controller' => 'v1/measure',
             'pluralize' => false,
             'patterns' => [
@@ -95,6 +109,21 @@ class Module extends \yii\base\Module
                 'OPTIONS <id:\d+>' => 'options',
                 'PUT <id:\d+>' => 'update',
                 'GET <id:\d+>' => 'view',
+            ]
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/permission',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'POST' => 'create',
+                'GET' => 'index',
+
+                'OPTIONS <id:\d+>' => 'options',
+                'PUT <id:\d+>' => 'update',
             ]
         ],
 
@@ -129,6 +158,67 @@ class Module extends \yii\base\Module
                 'POST <id:\d+>' => 'status',
                 'PUT <id:\d+>' => 'update',
 
+            ]
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/region',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'POST' => 'create',
+                'GET' => 'index',
+
+                'OPTIONS <id:\d+>' => 'options',
+                'PUT <id:\d+>' => 'update',
+            ]
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/file',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'POST' => 'upload',
+            ],
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/client',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'POST' => 'create',
+                'GET' => 'index',
+
+                'OPTIONS <id:\d+>' => 'options',
+                'PUT <id:\d+>' => 'update',
+
+                'OPTIONS <id:\d+>/<text:>' => 'options',
+                'DELETE <id:\d+>/<text:>' => 'delete',
+            ]
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/employee',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'POST' => 'create',
+                'GET' => 'index',
+
+                'OPTIONS <id:\d+>' => 'options',
+                'GET <id:\d+>' => 'view',
+                'PUT <id:\d+>' => 'update',
+                'DELETE <id:\d+>' => 'delete',
             ]
         ],
 

@@ -4,6 +4,7 @@ namespace api\modules\v1\controllers;
 
 
 use api\models\form\LoginForm;
+use api\models\form\SettingsForm;
 use common\components\ApiController;
 use common\models\User;
 use Yii;
@@ -30,6 +31,16 @@ class UserController extends ApiController
     }
 
 
+    public function actionSettings(){
+        $requestParams = Yii::$app->getRequest()->getBodyParams();
+        $form = new SettingsForm();
+        $form->setAttributes($requestParams);
+        $response = $form->save();
+        if (!$response){
+            return $form;
+        }
+        return $response;
+    }
 
 
 

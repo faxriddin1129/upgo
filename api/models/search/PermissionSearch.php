@@ -17,8 +17,8 @@ class PermissionSearch extends Permission
     public function rules()
     {
         return [
-            [['id', 'user_id', 'permission'], 'integer'],
-            [['position', 'name', 'action_id'], 'safe'],
+            [['id'], 'integer'],
+            [['name', 'action_id'], 'safe'],
         ];
     }
 
@@ -59,12 +59,9 @@ class PermissionSearch extends Permission
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'user_id' => $this->user_id,
-            'permission' => $this->permission,
         ]);
 
-        $query->andFilterWhere(['like', 'position', $this->position])
-            ->andFilterWhere(['like', 'name', $this->name])
+        $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'action_id', $this->action_id]);
 
         return $dataProvider;

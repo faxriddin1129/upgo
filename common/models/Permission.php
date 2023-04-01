@@ -8,13 +8,10 @@ use Yii;
  * This is the model class for table "{{%permission}}".
  *
  * @property int $id
- * @property string|null $position
  * @property string|null $name
  * @property string|null $action_id
- * @property int|null $user_id
- * @property int|null $permission
  *
- * @property User $user
+ * @property PermissionUser[] $permissionUsers
  */
 class Permission extends \yii\db\ActiveRecord
 {
@@ -32,10 +29,10 @@ class Permission extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['name', 'action_id'], 'required'],
             [['name'], 'string'],
-            [['user_id', 'permission'], 'integer'],
-            [['position', 'action_id'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['action_id'], 'string', 'max' => 255],
+            ['action_id', 'unique', 'targetClass' => '\common\models\Permission', 'message' => 'This action_id has already been taken.'],
         ];
     }
 
@@ -46,21 +43,18 @@ class Permission extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'position' => Yii::t('app', 'Position'),
             'name' => Yii::t('app', 'Name'),
             'action_id' => Yii::t('app', 'Action ID'),
-            'user_id' => Yii::t('app', 'User ID'),
-            'permission' => Yii::t('app', 'Permission'),
         ];
     }
 
     /**
-     * Gets query for [[User]].
+     * Gets query for [[PermissionUsers]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUser()
+    public function getPermissionUsers()
     {
-        return $this->hasOne(User::class, ['id' => 'user_id']);
+        return $this->hasMany(PermissionUser::class, ['permission_id' => 'id']);
     }
 }

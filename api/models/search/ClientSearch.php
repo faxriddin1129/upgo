@@ -48,7 +48,11 @@ class ClientSearch extends Client
             'query' => $query,
         ]);
 
-        $this->load($params);
+        if (!$this->load($params) && $params) {
+            if (array_key_exists('filter',$params)){
+                $this->setAttributes($params['filter']);
+            }
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -72,6 +76,8 @@ class ClientSearch extends Client
             ->andFilterWhere(['like', 'nearby', $this->nearby])
             ->andFilterWhere(['like', 'inn', $this->inn])
             ->andFilterWhere(['like', 'deleted_description', $this->deleted_description]);
+
+        $query->andWhere(['<>', 'status', Client::STATUS_DELETED]);
 
         return $dataProvider;
     }

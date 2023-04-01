@@ -40,6 +40,8 @@ class Region extends \yii\db\ActiveRecord
     {
         return [
             [['created_at', 'updated_at'], 'integer'],
+            [['name'], 'required'],
+            ['name', 'unique', 'targetClass' => '\common\models\Region', 'message' => 'This name has already been taken.'],
             [['name'], 'string', 'max' => 255],
         ];
     }

@@ -74,6 +74,8 @@ class UserSearch extends User
             ->andFilterWhere(['like', 'token', $this->token])
             ->andFilterWhere(['like', 'verification_token', $this->verification_token]);
 
+        $query->andWhere(['<>', 'status', User::STATUS_DELETED]);
+
         return $dataProvider;
     }
 }

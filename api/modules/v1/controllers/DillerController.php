@@ -6,7 +6,6 @@ use api\models\form\DillerForm;
 use api\models\search\UserSearch;
 use common\components\ApiController;
 
-use common\models\Client;
 use common\models\User;
 use yii\web\NotFoundHttpException;
 

@@ -10,6 +10,7 @@ use yii\rest\Controller;
 use yii\rest\IndexAction;
 use yii\rest\OptionsAction;
 use yii\rest\ViewAction;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -84,5 +85,6 @@ abstract class ApiController extends  Controller
             ]
         ];
     }
+
 
 }
