@@ -53,7 +53,7 @@ class m230329_104247_create_permission_user_table extends Migration
             '{{%fk-permission_user-user_id}}',
             '{{%permission_user}}',
             'user_id',
-            '{{%User}}',
+            '{{%user}}',
             'id',
             'CASCADE'
         );
