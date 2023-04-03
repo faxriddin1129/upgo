@@ -222,6 +222,38 @@ class Module extends \yii\base\Module
             ]
         ],
 
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/product',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'POST' => 'create',
+                'GET' => 'index',
+
+                'OPTIONS <id:\d+>' => 'options',
+                'GET <id:\d+>' => 'view',
+                'PUT <id:\d+>' => 'update',
+                'DELETE <id:\d+>' => 'delete',
+            ]
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/stock',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'POST' => 'create',
+                'GET' => 'index',
+
+                'OPTIONS /delete' => 'options',
+                'POST /delete' => 'delete',
+            ]
+        ],
+
     ];
 
     /**

@@ -7,23 +7,23 @@ use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "{{%stock_product}}".
+ * This is the model class for table "{{%remove_product}}".
  *
  * @property int $id
  * @property int|null $product_id
- * @property float|null $count
+ * @property int|null $count
+ * @property int|null $stock_id
  * @property int|null $created_at
  * @property int|null $updated_at
  * @property int|null $created_by
  * @property int|null $updated_by
- * @property int|null $stock_id
  *
  * @property User $createdBy
  * @property Product $product
  * @property Stock $stock
  * @property User $updatedBy
  */
-class StockProduct extends \yii\db\ActiveRecord
+class RemoveProduct extends \yii\db\ActiveRecord
 {
 
     public function behaviors()
@@ -39,7 +39,7 @@ class StockProduct extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%stock_product}}';
+        return '{{%remove_product}}';
     }
 
     /**
@@ -48,9 +48,7 @@ class StockProduct extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'count', 'stock_id'], 'required'],
-            [['product_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'stock_id'], 'integer'],
-            [['count'], 'number'],
+            [['product_id', 'count', 'stock_id', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::class, 'targetAttribute' => ['product_id' => 'id']],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::class, 'targetAttribute' => ['stock_id' => 'id']],
@@ -67,11 +65,11 @@ class StockProduct extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'product_id' => Yii::t('app', 'Product ID'),
             'count' => Yii::t('app', 'Count'),
+            'stock_id' => Yii::t('app', 'Stock ID'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
             'created_by' => Yii::t('app', 'Created By'),
             'updated_by' => Yii::t('app', 'Updated By'),
-            'stock_id' => Yii::t('app', 'Stock ID'),
         ];
     }
 
@@ -113,25 +111,5 @@ class StockProduct extends \yii\db\ActiveRecord
     public function getUpdatedBy()
     {
         return $this->hasOne(User::class, ['id' => 'updated_by']);
-    }
-
-    public function fields()
-    {
-        return [
-            'id',
-            'product_id',
-            'product' => function($model){
-                return $model->product;
-            },
-            'count',
-            'created_at',
-            'updated_at',
-            'created_by',
-            'updated_by',
-            'stock_id',
-            'stock' => function($model){
-                return $model->stock;
-            },
-        ];
     }
 }

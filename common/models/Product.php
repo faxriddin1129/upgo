@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\ActiveRecord;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -21,6 +22,8 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $updated_at
  * @property int|null $created_by
  * @property int|null $updated_by
+ * @property int|null $user_id
+ * @property int|null $status
  *
  * @property Category $category
  * @property User $createdBy
@@ -29,9 +32,14 @@ use yii\behaviors\TimestampBehavior;
  * @property OrderProduct[] $orderProducts
  * @property StockProduct[] $stockProducts
  * @property User $updatedBy
+ * @property User $user
  */
-class Product extends \yii\db\ActiveRecord
+class Product extends ActiveRecord
 {
+
+    const STATUS_DELETED = 0;
+    const STATUS_INACTIVE = 9;
+    const STATUS_ACTIVE = 10;
 
     public function behaviors()
     {
@@ -39,6 +47,16 @@ class Product extends \yii\db\ActiveRecord
             TimestampBehavior::class,
             BlameableBehavior::class
         ];
+    }
+
+    public static function dropdownStatus(){
+
+        return [
+            self::STATUS_ACTIVE => 'Active',
+            self::STATUS_INACTIVE => 'InActive',
+            self::STATUS_DELETED => 'Deleted',
+        ];
+
     }
 
     /**
@@ -55,8 +73,9 @@ class Product extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['get_price', 'sell_price', 'file_id', 'measure_id', 'category_id', 'description', 'name'], 'required'],
             [['get_price', 'sell_price'], 'number'],
-            [['file_id', 'measure_id', 'category_id', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
+            [['file_id', 'measure_id', 'category_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'user_id', 'status'], 'integer'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
@@ -64,6 +83,7 @@ class Product extends \yii\db\ActiveRecord
             [['file_id'], 'exist', 'skipOnError' => true, 'targetClass' => File::class, 'targetAttribute' => ['file_id' => 'id']],
             [['measure_id'], 'exist', 'skipOnError' => true, 'targetClass' => Measure::class, 'targetAttribute' => ['measure_id' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updated_by' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -85,6 +105,8 @@ class Product extends \yii\db\ActiveRecord
             'updated_at' => Yii::t('app', 'Updated At'),
             'created_by' => Yii::t('app', 'Created By'),
             'updated_by' => Yii::t('app', 'Updated By'),
+            'user_id' => Yii::t('app', 'User ID'),
+            'status' => Yii::t('app', 'Status'),
         ];
     }
 
@@ -156,5 +178,50 @@ class Product extends \yii\db\ActiveRecord
     public function getUpdatedBy()
     {
         return $this->hasOne(User::class, ['id' => 'updated_by']);
+    }
+
+    /**
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'name',
+            'get_price',
+            'sell_price',
+            'file_id',
+            'file' => function($model){
+                return $model->file->url;
+            },
+            'measure_id',
+            'measure' => function($model){
+                return $model->measure->name;
+            },
+            'category_id',
+            'category' => function($model){
+                return $model->category->name;
+            },
+            'description',
+            'created_at',
+            'updated_at',
+            'created_by',
+            'updated_by',
+            'user_id',
+            'status',
+            'diller' => function($model){
+                return $model->user->userDetail;
+            },
+            'owner' => function($model){
+                return $this->createdBy->userDetail;
+            }
+        ];
     }
 }

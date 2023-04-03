@@ -2,6 +2,7 @@
 
 namespace api\models\search;
 
+use common\models\Category;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\StockProduct;
@@ -11,14 +12,20 @@ use common\models\StockProduct;
  */
 class StockProductSearch extends StockProduct
 {
+
+    public $name;
+    public $category_id;
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'product_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'stock_id'], 'integer'],
+            [['id', 'product_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'stock_id', 'category_id'], 'integer'],
             [['count'], 'number'],
+            [['name'], 'string'],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
 
@@ -48,7 +55,11 @@ class StockProductSearch extends StockProduct
             'query' => $query,
         ]);
 
-        $this->load($params);
+        if (!$this->load($params) && $params) {
+            if (array_key_exists('filter',$params)){
+                $this->setAttributes($params['filter']);
+            }
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -68,6 +79,20 @@ class StockProductSearch extends StockProduct
             'stock_id' => $this->stock_id,
         ]);
 
+        if ($this->name){
+            $this->name = strtolower($this->name);
+            $query->leftJoin('product p', 'p.id=stock_product.product_id')
+                ->andFilterWhere(['like', 'name', $this->name]);
+        }
+
+        if ($this->category_id){
+            $this->category_id = strtolower($this->category_id);
+            $query->leftJoin('product p', 'p.id=stock_product.product_id');
+            $query->leftJoin('category c', 'c.id=p.id')
+                ->andFilterWhere(['like', 'category_id', $this->category_id]);
+        }
+
         return $dataProvider;
     }
 }
+

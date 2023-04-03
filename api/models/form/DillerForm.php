@@ -87,7 +87,7 @@ class DillerForm extends Model
 
 
         $transaction->commit();
-        return $this;
+        return $userModel;
     }
 
     public function update(){
@@ -127,7 +127,7 @@ class DillerForm extends Model
 
 
         $transaction->commit();
-        return $this;
+        return $userModel;
     }
 
 }
