@@ -3,6 +3,7 @@
 namespace api\models\form;
 
 use common\models\Product;
+use common\models\RemoveProduct;
 use common\models\Stock;
 use common\models\StockProduct;
 use common\models\User;
@@ -51,16 +52,28 @@ class StockProductDeleteForm extends Model
         }
 
         if ($stockProduct->count < $this->count){
-            throw new BadRequestHttpException('');
+            throw new BadRequestHttpException('Not enough product!');
         }
 
-//        $stockProduct->count += $this->count;
-//        if (!$stockProduct->save()){
-//            $this->addErrors($stockProduct->errors);
-//            return false;
-//        }
+        $transaction = \Yii::$app->db->beginTransaction();
+        $stockProduct->count -= $this->count;
+        if (!$stockProduct->save()){
+            $transaction->rollBack();
+            $this->addErrors($stockProduct->errors);
+            return false;
+        }
 
-        return null;
+        $removeModel = new RemoveProduct();
+        $removeModel->setAttributes($this->attributes);
+        $removeModel->stock_id = $stock->id;
+        if (!$removeModel->save()){
+            $transaction->rollBack();
+            $this->addErrors($removeModel->errors);
+            return false;
+        }
+
+        $transaction->commit();
+        return $stockProduct;
 
     }
 

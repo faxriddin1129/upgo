@@ -17,6 +17,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $updated_at
  * @property int|null $created_by
  * @property int|null $updated_by
+ * @property string|null $comment
  *
  * @property User $createdBy
  * @property Product $product
@@ -49,6 +50,7 @@ class RemoveProduct extends \yii\db\ActiveRecord
     {
         return [
             [['product_id', 'count', 'stock_id', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
+            [['comment'], 'string'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::class, 'targetAttribute' => ['product_id' => 'id']],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::class, 'targetAttribute' => ['stock_id' => 'id']],
@@ -70,6 +72,7 @@ class RemoveProduct extends \yii\db\ActiveRecord
             'updated_at' => Yii::t('app', 'Updated At'),
             'created_by' => Yii::t('app', 'Created By'),
             'updated_by' => Yii::t('app', 'Updated By'),
+            'comment' => Yii::t('app', 'Comment'),
         ];
     }
 
