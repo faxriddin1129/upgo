@@ -6,7 +6,7 @@ RewriteRule ^(frontend|backend|api)/web/ - [L]
 # Handle the case of backend, skip ([S=1]) the following rule, if current matched
 RewriteRule ^admin(/(.*))?$ backend/web/$2 [S=2]
 
-# Handle the case of backend, skip ([S=1]) the following rule, if current matched
+# Handle the case of backend, skip ([S=1]) the following rule, if curreasdnt matched
 RewriteRule ^api(/(.*))?$ api/web/$2 [S=1]
 
 # handle the case of frontend
