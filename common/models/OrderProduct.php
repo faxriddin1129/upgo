@@ -70,4 +70,14 @@ class OrderProduct extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Product::class, ['id' => 'product_id']);
     }
+
+    public function fields()
+    {
+        return [
+            'product' => function($model){
+                return $model->product;
+            },
+            'count',
+        ];
+    }
 }

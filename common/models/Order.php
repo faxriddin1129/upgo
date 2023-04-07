@@ -41,6 +41,9 @@ class Order extends \yii\db\ActiveRecord
     const STATUS_DEBTOR = 2;
     const STATUS_APPROVED = 3;
 
+    const STATUS_PAYED = 1;
+    const STATUS__NOT_PAYED = 0;
+
     public function behaviors()
     {
         return [
@@ -56,6 +59,15 @@ class Order extends \yii\db\ActiveRecord
             self::STATUS_PENDING => 'Pending',
             self::STATUS_DEBTOR => 'Debtor',
             self::STATUS_APPROVED => 'Approved',
+        ];
+
+    }
+
+    public static function dropdownStatusPay(){
+
+        return [
+            self::STATUS_PAYED => 'Payed',
+            self::STATUS__NOT_PAYED => 'Not Payed',
         ];
 
     }
@@ -176,5 +188,73 @@ class Order extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'client_id',
+            'client' => function($model){
+                return $model->client;
+            },
+            'user_id',
+            'user' => function($model){
+                return $model->user;
+            },
+            'payment_type_id',
+            'payment_type' => function($model){
+                return $model->paymentType;
+            },
+            'cashback',
+            'delivery_time',
+            'total_price',
+            'debt',
+            'debt_kil' => function($model){
+                return $model->debtKills;
+            },
+            'pay_status',
+            'pay_status_format' => function($model){
+                return self::dropdownStatusPay()[$model->pay_status];
+            },
+            'get_price',
+            'status',
+            'status_format' => function($model){
+                return self::dropdownStatus()[$model->status];
+            },
+            'products' => function($model){
+                return $model->orderProducts;
+            }
+        ];
+    }
+
+    public function extraFields()
+    {
+        return [
+            'owner' => function($model){
+                return [
+                    'created_by' => [
+                        'user_id' => $model->created_by,
+                        'phone' => $model->createdBy->first_name,
+                    ],
+                    'updated_by' => [
+                        'user_id' => $model->updated_by,
+                        'phone' => $model->updatedBy->first_name,
+                    ],
+                ];
+            },
+            'time' => function($model){
+                return [
+                    'created_at' => [
+                        'time' => $model->created_at,
+                        'format' => date('Y-m-d H:i', $model->created_at),
+                    ],
+                    'updated_at' => [
+                        'time' => $model->updated_at,
+                        'format' => date('Y-m-d H:i', $model->updated_at),
+                    ],
+                ];
+            },
+        ];
     }
 }

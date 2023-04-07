@@ -99,4 +99,36 @@ class DebtKill extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'updated_by']);
     }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'debt_price',
+            'owner' => function($model){
+                return [
+                    'created_by' => [
+                        'user_id' => $model->created_by,
+                        'phone' => $model->createdBy->first_name,
+                    ],
+                    'updated_by' => [
+                        'user_id' => $model->updated_by,
+                        'phone' => $model->updatedBy->first_name,
+                    ],
+                ];
+            },
+            'time' => function($model){
+                return [
+                    'created_at' => [
+                        'time' => $model->created_at,
+                        'format' => date('Y-m-d H:i', $model->created_at),
+                    ],
+                    'updated_at' => [
+                        'time' => $model->updated_at,
+                        'format' => date('Y-m-d H:i', $model->updated_at),
+                    ],
+                ];
+            },
+        ];
+    }
 }

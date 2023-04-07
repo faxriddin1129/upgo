@@ -254,6 +254,21 @@ class Module extends \yii\base\Module
             ]
         ],
 
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/order',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'POST' => 'create',
+                'GET' => 'index',
+
+                'OPTIONS <id:\d+>' => 'options',
+                'GET <id:\d+>' => 'view',
+            ]
+        ],
+
     ];
 
     /**

@@ -48,7 +48,11 @@ class OrderSearch extends Order
             'query' => $query,
         ]);
 
-        $this->load($params);
+        if (!$this->load($params) && $params) {
+            if (array_key_exists('filter',$params)){
+                $this->setAttributes($params['filter']);
+            }
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
