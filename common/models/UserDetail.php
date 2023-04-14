@@ -83,4 +83,22 @@ class UserDetail extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'first_name',
+            'last_name',
+            'middle_name',
+            'address',
+            'file_id',
+            'salary_int',
+            'salary_percent',
+            'legal_name',
+            'file' => function($model){
+                return $model->file;
+            }
+        ];
+    }
 }
