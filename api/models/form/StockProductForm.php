@@ -40,7 +40,7 @@ class StockProductForm extends Model
         }
 
         if (!$stock){
-            throw new BadRequestHttpException('Error!');
+            throw new BadRequestHttpException('Stock not found!');
         }
 
         $stockProduct = StockProduct::findOne(['product_id' => $this->product_id, 'stock_id' => $stock->id]);
