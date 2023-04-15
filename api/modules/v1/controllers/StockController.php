@@ -35,7 +35,7 @@ class StockController extends ApiController
             $stock_id = Stock::findOne(['user_id' => \Yii::$app->user->identity['parent_id']]);
         }
         if (!$stock_id){
-            throw new BadRequestHttpException('Error!');
+            throw new BadRequestHttpException('Stock not found!');
         }
 
         $search = new StockProductSearch(['stock_id' => $stock_id->id]);
