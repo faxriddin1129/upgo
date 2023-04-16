@@ -44,6 +44,9 @@ class Order extends \yii\db\ActiveRecord
     const STATUS_PAYED = 1;
     const STATUS__NOT_PAYED = 0;
 
+    const DEBT_ACTIVE = 1;
+    const DEBT_INACTIVE = 0;
+
     public function behaviors()
     {
         return [

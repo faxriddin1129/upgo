@@ -109,11 +109,11 @@ class DebtKill extends \yii\db\ActiveRecord
                 return [
                     'created_by' => [
                         'user_id' => $model->created_by,
-                        'phone' => $model->createdBy->first_name,
+                        'phone' => $model->createdBy->username,
                     ],
                     'updated_by' => [
                         'user_id' => $model->updated_by,
-                        'phone' => $model->updatedBy->first_name,
+                        'phone' => $model->updatedBy->username,
                     ],
                 ];
             },

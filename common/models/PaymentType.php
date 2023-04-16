@@ -28,6 +28,7 @@ class PaymentType extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
         ];
     }
