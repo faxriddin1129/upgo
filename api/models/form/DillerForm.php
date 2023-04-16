@@ -24,7 +24,6 @@ class DillerForm extends Model
     public function rules()
     {
         return [
-            [['legal_name', 'first_name', 'last_name', 'phone', 'password', 'password_confirm', 'address'], 'required'],
             [['legal_name', 'first_name', 'last_name', 'phone', 'password', 'password_confirm', 'address'], 'string', 'min' => 4],
             [['password_confirm'], 'compare', 'compareAttribute' => 'password'],
             ['phone', function ($attribute, $params, $validator) {

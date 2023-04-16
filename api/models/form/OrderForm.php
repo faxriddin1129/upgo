@@ -8,7 +8,10 @@ use common\models\Order;
 use common\models\OrderProduct;
 use common\models\PaymentType;
 use common\models\Product;
+use common\models\User;
 use yii\base\Model;
+use yii\db\Exception;
+use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
 
 class OrderForm extends Model
@@ -19,6 +22,7 @@ class OrderForm extends Model
     public $client_id;
     public $products;
     public $total_price;
+    public $order_id;
     public $cashback;
 
     public function rules()
@@ -30,6 +34,7 @@ class OrderForm extends Model
             [['products'], 'safe'],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::class, 'targetAttribute' => ['client_id' => 'id']],
             [['payment_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentType::class, 'targetAttribute' => ['payment_type_id' => 'id']],
+            [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::class, 'targetAttribute' => ['order_id' => 'id']],
         ];
     }
 
@@ -49,9 +54,17 @@ class OrderForm extends Model
         $model->payment_type_id = $this->payment_type_id;
         $model->cashback = $this->cashback;
         $model->delivery_time = $this->delivery_time;
-        $model->pay_status = Order::STATUS__NOT_PAYED;
-        $model->status = Order::STATUS_DEBTOR;
+        $model->pay_status = Order::STATUS_DEBTOR;
+        $model->status = Order::STATUS_NEW;
         $model->debt = Order::DEBT_ACTIVE;
+
+        if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){
+            $model->diller_id = \Yii::$app->user->id;
+        }
+        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+            $model->diller_id = \Yii::$app->user->identity['parent_id'];
+        }
+
         if (!$model->save()){
             $transaction->rollBack();
             $this->addErrors($model->getErrors());
@@ -100,4 +113,73 @@ class OrderForm extends Model
         return $model;
     }
 
+
+    /**
+     * @throws \Throwable
+     * @throws Exception
+     * @throws StaleObjectException
+     * @throws BadRequestHttpException
+     */
+    public function update(){
+        if (!$this->validate()){
+            return false;
+        }
+
+        if (!is_array($this->products)){
+            throw new BadRequestHttpException('Products only array');
+        }
+
+        $transaction = \Yii::$app->db->beginTransaction();
+        $model = Order::findOne(['id' => $this->order_id]);
+        $model->payment_type_id = $this->payment_type_id;
+        $model->cashback = $this->cashback;
+        $model->delivery_time = $this->delivery_time;
+        if (!$model->save()){
+            $transaction->rollBack();
+            $this->addErrors($model->getErrors());
+            return false;
+        }
+
+
+        foreach ($this->products as $product) {
+            $orderProductModel = OrderProduct::findOne(['id' => $product['id']]);
+            $orderProductModel->order_id = $model->id;
+            $orderProductModel->setAttributes($product);
+            if (!$orderProductModel->save()){
+                $transaction->rollBack();
+                $this->addErrors($orderProductModel->getErrors());
+                return false;
+            }
+        }
+
+        $get_price = 0;
+        $total_price = 0;
+        $productsOreder = OrderProduct::find()->andWhere(['order_id' => $model->id])->asArray()->all();
+        foreach ($productsOreder as $product) {
+            $pro = Product::findOne(['id' => $product['product_id']]);
+            $total_price += ($pro->sell_price * $product['count']);
+            $get_price += ($pro->get_price * $product['count']);
+        }
+
+        $model->update_total_price = $total_price;
+        $model->get_price = $get_price;
+        if (!$model->save()){
+            $transaction->rollBack();
+            $this->addErrors($model->getErrors());
+            return false;
+        }
+
+        $modelDebt = DebtKill::findOne(['order_id' => $model->id]);
+        $modelDebt->order_id = $model->id;
+        $modelDebt->debt_price = $total_price;
+        if (!$modelDebt->save()){
+            $transaction->rollBack();
+            $this->addErrors($modelDebt->getErrors());
+            return false;
+        }
+
+
+        $transaction->commit();
+        return $model;
+    }
 }

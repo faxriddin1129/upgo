@@ -4,10 +4,12 @@ namespace api\modules\v1\controllers;
 
 use api\models\form\OrderForm;
 use api\models\search\OrderSearch;
-use common\components\ApiController;
+use common\components\CrudController;
 use common\models\Order;
+use common\models\User;
+use yii\web\NotFoundHttpException;
 
-class OrderController extends ApiController
+class OrderController extends CrudController
 {
 
     public $modelClass = Order::class;
@@ -17,14 +19,22 @@ class OrderController extends ApiController
     {
         $parent = parent::actions();
         unset($parent['index']);
+        unset($parent['update']);
+        unset($parent['create']);
         return $parent;
     }
 
     public function actionIndex()
     {
-        $search = new OrderSearch();
-        $dataProvider = $search->search(\Yii::$app->request->queryParams);
-
+        $dataProvider = [];
+        if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){
+            $search = new OrderSearch(['diller_id' => \Yii::$app->user->id]);
+            $dataProvider = $search->search(\Yii::$app->request->queryParams);
+        }
+        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+            $search = new OrderSearch(['user_id' => \Yii::$app->user->id]);
+            $dataProvider = $search->search(\Yii::$app->request->queryParams);
+        }
         return $dataProvider;
     }
 
@@ -39,6 +49,29 @@ class OrderController extends ApiController
         }
 
         return $response;
+    }
+
+    public function actionUpdate($id)
+    {
+        $queryParams = \Yii::$app->getRequest()->getBodyParams();
+        $model = new OrderForm(['order_id' => $id]);
+        $model->setAttributes($queryParams);
+        $response = $model->update();
+        if (!$response){
+            return $model;
+        }
+
+        return $response;
+    }
+
+    public function actionPending($id){
+        $model = Order::findOne(['id' => $id]);
+        if (!$model){
+            throw new NotFoundHttpException('Order not found!');
+        }
+
+        $model->updateAttributes(['status' => Order::STATUS_PENDING]);
+        return true;
     }
 
 

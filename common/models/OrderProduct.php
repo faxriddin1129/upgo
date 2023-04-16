@@ -75,10 +75,11 @@ class OrderProduct extends \yii\db\ActiveRecord
     public function fields()
     {
         return [
+            'id',
+            'count',
             'product' => function($model){
                 return $model->product;
             },
-            'count',
         ];
     }
 }

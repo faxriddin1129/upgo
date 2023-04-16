@@ -11,14 +11,23 @@ use common\models\Order;
  */
 class OrderSearch extends Order
 {
+
+    public  $start;
+    public  $end;
+    public  $agent;
+    public  $region_id;
+    public  $legal_name;
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'client_id', 'user_id', 'payment_type_id', 'cashback', 'delivery_time', 'pay_status', 'status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
+            [['id', 'client_id', 'user_id', 'payment_type_id', 'diller_id', 'cashback', 'delivery_time', 'pay_status', 'status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
             [['total_price', 'debt', 'get_price'], 'number'],
+            [['start', 'end', 'region_id'], 'integer'],
+            [['agent', 'legal_name'], 'string'],
         ];
     }
 
@@ -65,6 +74,7 @@ class OrderSearch extends Order
             'id' => $this->id,
             'client_id' => $this->client_id,
             'user_id' => $this->user_id,
+            'diller_id' => $this->diller_id,
             'payment_type_id' => $this->payment_type_id,
             'cashback' => $this->cashback,
             'delivery_time' => $this->delivery_time,
@@ -73,11 +83,32 @@ class OrderSearch extends Order
             'pay_status' => $this->pay_status,
             'get_price' => $this->get_price,
             'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'created_by' => $this->created_by,
-            'updated_by' => $this->updated_by,
         ]);
+
+
+        if ($this->start and $this->end){
+            $query->andWhere(['>=', 'created_at', $this->start])->andWhere(['<', 'created_at', $this->end]);
+        }
+
+        if ($this->agent){
+            $this->agent = strtolower($this->agent);
+            $query->leftJoin('user u', 'u.id=order.user_id');
+            $query->leftJoin('user_detail ud', 'u.id=ud.user_id');
+            $query->andFilterWhere(['like', 'first_name', $this->agent]);
+        }
+
+        if ($this->legal_name){
+            $this->agent = strtolower($this->agent);
+            $query->leftJoin('client c', 'c.id=order.client_i   d');
+            $query->andFilterWhere(['like', 'legal_name', $this->legal_name]);
+        }
+
+        if ($this->region_id){
+            $query->leftJoin('client c', 'c.id=order.client_id');
+            $query->andFilterWhere(['like', 'region_id', $this->region_id]);
+        }
+
+
 
         return $dataProvider;
     }

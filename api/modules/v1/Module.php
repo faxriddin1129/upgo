@@ -282,6 +282,11 @@ class Module extends \yii\base\Module
 
                 'OPTIONS <id:\d+>' => 'options',
                 'GET <id:\d+>' => 'view',
+                'DELETE <id:\d+>' => 'delete',
+                'PUT <id:\d+>' => 'update',
+
+                'OPTIONS <id:\d+>/pending' => 'options',
+                'GET <id:\d+>/pending' => 'pending',
             ]
         ],
 

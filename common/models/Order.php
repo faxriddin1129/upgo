@@ -24,10 +24,14 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $updated_at
  * @property int|null $created_by
  * @property int|null $updated_by
+ * @property int|null $diller_id
+ * @property int|null $update_total_price
+ * @property int|null $payment_price
  *
  * @property Client $client
  * @property User $createdBy
  * @property DebtKill[] $debtKills
+ * @property User $diller
  * @property OrderProduct[] $orderProducts
  * @property PaymentType $paymentType
  * @property User $updatedBy
@@ -38,11 +42,10 @@ class Order extends \yii\db\ActiveRecord
 
     const STATUS_NEW = 0;
     const STATUS_PENDING = 1;
-    const STATUS_DEBTOR = 2;
-    const STATUS_APPROVED = 3;
+    const STATUS_APPROVED = 2;
 
     const STATUS_PAYED = 1;
-    const STATUS__NOT_PAYED = 0;
+    const STATUS_DEBTOR = 0;
 
     const DEBT_ACTIVE = 1;
     const DEBT_INACTIVE = 0;
@@ -60,7 +63,6 @@ class Order extends \yii\db\ActiveRecord
         return [
             self::STATUS_NEW => 'New',
             self::STATUS_PENDING => 'Pending',
-            self::STATUS_DEBTOR => 'Debtor',
             self::STATUS_APPROVED => 'Approved',
         ];
 
@@ -70,10 +72,11 @@ class Order extends \yii\db\ActiveRecord
 
         return [
             self::STATUS_PAYED => 'Payed',
-            self::STATUS__NOT_PAYED => 'Not Payed',
+            self::STATUS_DEBTOR => 'Not Payed',
         ];
 
     }
+
 
     /**
      * {@inheritdoc}
@@ -89,10 +92,11 @@ class Order extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['client_id', 'user_id', 'payment_type_id', 'cashback', 'delivery_time', 'pay_status', 'status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
-            [['total_price', 'debt', 'get_price'], 'number'],
+            [['client_id', 'user_id', 'payment_type_id', 'cashback', 'delivery_time', 'pay_status', 'status', 'created_at', 'updated_at', 'created_by', 'updated_by', 'diller_id'], 'integer'],
+            [['total_price', 'debt', 'get_price', 'update_total_price', 'payment_price'], 'number'],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::class, 'targetAttribute' => ['client_id' => 'id']],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
+            [['diller_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['diller_id' => 'id']],
             [['payment_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentType::class, 'targetAttribute' => ['payment_type_id' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updated_by' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -120,6 +124,7 @@ class Order extends \yii\db\ActiveRecord
             'updated_at' => Yii::t('app', 'Updated At'),
             'created_by' => Yii::t('app', 'Created By'),
             'updated_by' => Yii::t('app', 'Updated By'),
+            'diller_id' => Yii::t('app', 'Diller ID'),
         ];
     }
 
@@ -151,6 +156,16 @@ class Order extends \yii\db\ActiveRecord
     public function getDebtKills()
     {
         return $this->hasMany(DebtKill::class, ['order_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Diller]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDiller()
+    {
+        return $this->hasOne(User::class, ['id' => 'diller_id']);
     }
 
     /**
@@ -201,6 +216,10 @@ class Order extends \yii\db\ActiveRecord
             'client' => function($model){
                 return $model->client;
             },
+            'diller_id',
+            'diller' => function($model){
+                return $model->diller;
+            },
             'user_id',
             'user' => function($model){
                 return $model->user;
@@ -212,6 +231,9 @@ class Order extends \yii\db\ActiveRecord
             'cashback',
             'delivery_time',
             'total_price',
+            'payment_price',
+            'update_total_price',
+            'get_price',
             'debt',
             'debt_kil' => function($model){
                 return $model->debtKills;
@@ -220,14 +242,15 @@ class Order extends \yii\db\ActiveRecord
             'pay_status_format' => function($model){
                 return self::dropdownStatusPay()[$model->pay_status];
             },
-            'get_price',
             'status',
             'status_format' => function($model){
                 return self::dropdownStatus()[$model->status];
             },
             'products' => function($model){
                 return $model->orderProducts;
-            }
+            },
+            'created_at',
+            'updated_at',
         ];
     }
 
@@ -243,18 +266,6 @@ class Order extends \yii\db\ActiveRecord
                     'updated_by' => [
                         'user_id' => $model->updated_by,
                         'phone' => $model->updatedBy->first_name,
-                    ],
-                ];
-            },
-            'time' => function($model){
-                return [
-                    'created_at' => [
-                        'time' => $model->created_at,
-                        'format' => date('Y-m-d H:i', $model->created_at),
-                    ],
-                    'updated_at' => [
-                        'time' => $model->updated_at,
-                        'format' => date('Y-m-d H:i', $model->updated_at),
                     ],
                 ];
             },
