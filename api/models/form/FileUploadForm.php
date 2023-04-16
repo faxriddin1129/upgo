@@ -36,7 +36,7 @@ class FileUploadForm extends \yii\base\Model
         move_uploaded_file($this->file['tmp_name'], $target_dir.'/'.$newName);
 
         $fileModel = new File();
-        $fileModel->url = "http://upgo.loc/api/upload/".$newName;
+        $fileModel->url = "https://api.upgo.uz/api/upload/".$newName;
         if (!$fileModel->save()){
             throw new BadRequestHttpException('Please try again!');
         }
