@@ -88,7 +88,7 @@ class OrderController extends CrudController
         $modelDebt = DebtKill::findOne(['order_id' => $model->id]);
         $modelDebt->debt_price = 0;
 
-        if ($modelDebt->save() or $model->save()){
+        if (!$modelDebt->save() or !$model->save()){
             \Yii::$app->response->statusCode = 422;
             return  [
                 'errorProduct' => $model->getErrors(),
