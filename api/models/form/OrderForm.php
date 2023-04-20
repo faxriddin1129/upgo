@@ -200,7 +200,9 @@ class OrderForm extends Model
             if ($model->payment_price == $model->update_total_price){
                 $model->debt = Order::DEBT_INACTIVE;
             }
-            $modelDebt->debt_price = ($model->update_total_price - $model->payment_price);
+            if ($model->debt == Order::DEBT_ACTIVE){
+                $modelDebt->debt_price = ($model->update_total_price - $model->payment_price);
+            }
             $model->save();
             $modelDebt->save();
         }
