@@ -178,7 +178,7 @@ class OrderForm extends Model
 
         $modelDebt = DebtKill::findOne(['order_id' => $model->id]);
         $modelDebt->order_id = $model->id;
-        $modelDebt->debt_price = $total_price;
+        $modelDebt->debt_price = ($total_price - $model->payment_price);
         if (!$modelDebt->save()){
             $transaction->rollBack();
             $this->addErrors($modelDebt->getErrors());
