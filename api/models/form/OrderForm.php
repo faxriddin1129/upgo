@@ -197,8 +197,8 @@ class OrderForm extends Model
                 $modelDebt->delete();
             }else{
                 $model->update_total_price = ($model->update_total_price - $model->payment_price);
-                $modelDebt->debt_price = ($model->update_total_price - $model->payment_price);
             }
+            $modelDebt->debt_price = ($model->update_total_price - $model->payment_price);
             $model->save();
             $modelDebt->save();
         }
