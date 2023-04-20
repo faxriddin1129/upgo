@@ -290,7 +290,7 @@ class Module extends \yii\base\Module
                 'GET <id:\d+>/pending' => 'pending',
 
                 'OPTIONS <id:\d+>/finish' => 'options',
-                'GET <id:\d+>/finish' => 'pending',
+                'GET <id:\d+>/finish' => 'finish',
             ]
         ],
 
