@@ -148,7 +148,7 @@ class OrderForm extends Model
         foreach ($this->products as $product) {
             $orderProductModel = OrderProduct::findOne(['id' => $product['id']]);
             if (!$orderProductModel){
-                throw new NotFoundHttpException('Order not found!');
+                throw new NotFoundHttpException('Order Product not found!');
             }
             $orderProductModel->order_id = $model->id;
             $orderProductModel->setAttributes($product);
@@ -186,21 +186,19 @@ class OrderForm extends Model
         }
 
 
-        if ($this->payment_price or $this->debt_price){
+        if ($this->payment_price){
             if ($model->debt == Order::DEBT_INACTIVE){
                 $transaction->rollBack();
                 throw new BadRequestHttpException('Already Payment!');
             }
-            if ($this->payment_price >= ($model->update_total_price + $model->payment_price)){
+            $model->payment_price += $this->payment_price;
+            if ($model->payment_price > $model->update_total_price){
                 $transaction->rollBack();
                 throw new BadRequestHttpException('Big price!');
             }
-            $model->payment_price += $this->payment_price;
+
             if ($model->payment_price == $model->update_total_price){
                 $model->debt = Order::DEBT_INACTIVE;
-                $modelDebt->delete();
-            }else{
-                $model->update_total_price = ($model->update_total_price - $model->payment_price);
             }
             $modelDebt->debt_price = ($model->update_total_price - $model->payment_price);
             $model->save();
