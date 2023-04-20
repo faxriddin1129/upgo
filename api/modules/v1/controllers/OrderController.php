@@ -5,6 +5,7 @@ namespace api\modules\v1\controllers;
 use api\models\form\OrderForm;
 use api\models\search\OrderSearch;
 use common\components\CrudController;
+use common\models\DebtKill;
 use common\models\Order;
 use common\models\User;
 use yii\web\NotFoundHttpException;
@@ -74,5 +75,20 @@ class OrderController extends CrudController
         return true;
     }
 
+    public function actionFinish($id){
+        $model = Order::findOne(['id' => $id]);
+        if (!$model){
+            throw new NotFoundHttpException('Order not found!');
+        }
+
+        $model->payment_price = $model->update_total_price;
+        $model->status = Order::STATUS_APPROVED;
+        $model->debt = Order::DEBT_INACTIVE;
+        $model->save();
+        $modelDebt = DebtKill::findOne(['order_id' => $model->id]);
+        $modelDebt->updateAttributes(['debt_price' => 0]);
+
+        return true;
+    }
 
 }
