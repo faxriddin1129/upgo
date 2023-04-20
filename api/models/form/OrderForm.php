@@ -13,6 +13,7 @@ use yii\base\Model;
 use yii\db\Exception;
 use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
+use yii\web\NotFoundHttpException;
 
 class OrderForm extends Model
 {
@@ -146,6 +147,9 @@ class OrderForm extends Model
 
         foreach ($this->products as $product) {
             $orderProductModel = OrderProduct::findOne(['id' => $product['id']]);
+            if (!$orderProductModel){
+                throw new NotFoundHttpException('Order not found!');
+            }
             $orderProductModel->order_id = $model->id;
             $orderProductModel->setAttributes($product);
             if (!$orderProductModel->save()){
@@ -185,13 +189,15 @@ class OrderForm extends Model
 
         if ($this->payment_price or $this->debt_price){
             $model->payment_price += $this->payment_price;
-            if ( $model->payment_price == $model->update_total_price){
+            if ($model->payment_price == $model->update_total_price){
                 $model->debt = Order::DEBT_INACTIVE;
                 $modelDebt->delete();
             }else{
                 $model->update_total_price = ($model->update_total_price - $model->payment_price);
+                $modelDebt->debt_price = ($model->update_total_price - $model->payment_price);
             }
             $model->save();
+            $modelDebt->save();
         }
 
 
