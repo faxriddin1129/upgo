@@ -212,6 +212,11 @@ class Order extends \yii\db\ActiveRecord
     {
         return [
             'id',
+            'already_debt' => function($model){
+                $price =  Order::find()->andWhere(['debt' => Order::DEBT_ACTIVE])->andWhere(['diller_id' => $this->diller_id])->sum('update_total_price');
+                $payment =  Order::find()->andWhere(['debt' => Order::DEBT_ACTIVE])->andWhere(['diller_id' => $this->diller_id])->sum('payment_price');
+                return ($price - $payment);
+            },
             'client_id',
             'client' => function($model){
                 return $model->client;
@@ -237,9 +242,6 @@ class Order extends \yii\db\ActiveRecord
             'debt',
             'debt_kil' => function($model){
                 return $model->debtKills;
-            },
-            'already_debt' => function($model){
-                $orders =  Order::find()->andWhere(['debt' => Order::DEBT_ACTIVE])->andWhere(['diller_id' => $this->diller_id]);
             },
             'pay_status',
             'pay_status_format' => function($model){
