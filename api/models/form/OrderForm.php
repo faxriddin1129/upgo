@@ -186,8 +186,11 @@ class OrderForm extends Model
         }
 
 
-
         if ($this->payment_price or $this->debt_price){
+            if ($this->payment_price > ($model->update_total_price + $model->payment_price)){
+                $transaction->rollBack();
+                throw new BadRequestHttpException('Big price!');
+            }
             $model->payment_price += $this->payment_price;
             if ($model->payment_price == $model->update_total_price){
                 $model->debt = Order::DEBT_INACTIVE;
