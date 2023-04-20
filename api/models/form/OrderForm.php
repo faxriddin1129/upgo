@@ -24,13 +24,15 @@ class OrderForm extends Model
     public $total_price;
     public $order_id;
     public $cashback;
+    public $payment_price;
+    public $debt_price;
 
     public function rules()
     {
         return [
             [['payment_type_id', 'delivery_time', 'client_id', 'products'], 'required'],
             [['payment_type_id', 'delivery_time', 'client_id'], 'integer'],
-            [['total_price','cashback'], 'number'],
+            [['total_price','cashback','payment_price', 'payment_price'], 'number'],
             [['products'], 'safe'],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::class, 'targetAttribute' => ['client_id' => 'id']],
             [['payment_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentType::class, 'targetAttribute' => ['payment_type_id' => 'id']],
@@ -92,6 +94,7 @@ class OrderForm extends Model
         }
 
         $model->total_price = $total_price;
+        $model->update_total_price = $total_price;
         $model->get_price = $get_price;
         if (!$model->save()){
             $transaction->rollBack();
@@ -177,6 +180,20 @@ class OrderForm extends Model
             $this->addErrors($modelDebt->getErrors());
             return false;
         }
+
+
+
+        if ($this->payment_price or $this->debt_price){
+            $model->payment_price += $this->payment_price;
+            if ( $model->payment_price == $model->update_total_price){
+                $model->debt = Order::DEBT_INACTIVE;
+                $modelDebt->delete();
+            }else{
+                $model->update_total_price = ($model->update_total_price - $model->payment_price);
+            }
+            $model->save();
+        }
+
 
 
         $transaction->commit();

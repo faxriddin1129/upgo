@@ -8,6 +8,7 @@ use common\models\StockProduct;
 use common\models\User;
 use yii\base\Model;
 use yii\web\BadRequestHttpException;
+use yii\web\NotFoundHttpException;
 
 class StockProductForm extends Model
 {
@@ -44,6 +45,9 @@ class StockProductForm extends Model
         }
 
         $stockProduct = StockProduct::findOne(['product_id' => $this->product_id, 'stock_id' => $stock->id]);
+        if (!$stockProduct){
+            throw new NotFoundHttpException('Stock Product not found!');
+        }
         $stockProduct->count += $this->count;
         if (!$stockProduct->save()){
             $this->addErrors($stockProduct->errors);

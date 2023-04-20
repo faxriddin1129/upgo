@@ -18,7 +18,7 @@ class SettingsForm extends \yii\base\Model
     public function rules()
     {
         return [
-            [['legal_name', 'first_name', 'last_name', 'address', 'phone', 'password'], 'required'],
+//            [['legal_name', 'first_name', 'last_name', 'address', 'phone', 'password'], 'required'],
             [['legal_name', 'first_name', 'last_name', 'address', 'phone', 'password'], 'string'],
         ];
     }
@@ -52,6 +52,7 @@ class SettingsForm extends \yii\base\Model
             return false;
         }
 
+        $transaction->commit();
         return $userModel;
     }
 

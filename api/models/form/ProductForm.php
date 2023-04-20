@@ -105,7 +105,7 @@ class ProductForm extends Model
             $stock_id = Stock::findOne(['user_id' => \Yii::$app->user->identity['parent_id']]);
         }
         if (!$stock_id){
-            throw new BadRequestHttpException('Error!');
+            throw new BadRequestHttpException('Permission denied!');
         }
         $stockProductModel->product_id = $productModel->id;
         $stockProductModel->stock_id = $stock_id->id;

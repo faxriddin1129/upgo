@@ -215,6 +215,7 @@ class Module extends \yii\base\Module
 
                 'OPTIONS <id:\d+>' => 'options',
                 'PUT <id:\d+>' => 'update',
+                'GET <id:\d+>' => 'view',
 
                 'OPTIONS <id:\d+>/<text:>' => 'options',
                 'DELETE <id:\d+>/<text:>' => 'delete',

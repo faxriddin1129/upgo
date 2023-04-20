@@ -6,6 +6,7 @@ use api\models\form\ProductForm;
 use api\models\search\ProductSearch;
 use common\components\CrudController;
 use common\models\Product;
+use common\models\User;
 
 class ProductController extends CrudController
 {
@@ -24,8 +25,15 @@ class ProductController extends CrudController
 
     public function actionIndex()
     {
-        $search = new ProductSearch();
-        $dataProvider = $search->search(\Yii::$app->request->queryParams);
+        $dataProvider = [];
+        if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){
+            $search = new ProductSearch(['user_id' => \Yii::$app->user->id]);
+            $dataProvider = $search->search(\Yii::$app->request->queryParams);
+        }
+        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+            $search = new ProductSearch(['user_id' => \Yii::$app->user->identity['parent_id']]);
+            $dataProvider = $search->search(\Yii::$app->request->queryParams);
+        }
 
         return $dataProvider;
     }

@@ -238,6 +238,9 @@ class Order extends \yii\db\ActiveRecord
             'debt_kil' => function($model){
                 return $model->debtKills;
             },
+            'already_debt' => function($model){
+                $orders =  Order::find()->andWhere(['debt' => Order::DEBT_ACTIVE])->andWhere(['diller_id' => $this->diller_id]);
+            },
             'pay_status',
             'pay_status_format' => function($model){
                 return self::dropdownStatusPay()[$model->pay_status];
