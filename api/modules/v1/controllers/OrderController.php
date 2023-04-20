@@ -84,9 +84,17 @@ class OrderController extends CrudController
         $model->payment_price = $model->update_total_price;
         $model->status = Order::STATUS_APPROVED;
         $model->debt = Order::DEBT_INACTIVE;
-        $model->save();
+
         $modelDebt = DebtKill::findOne(['order_id' => $model->id]);
-        $modelDebt->updateAttributes(['debt_price' => 0]);
+        $modelDebt->debt_price = 0;
+
+        if ($modelDebt->save() or $model->save()){
+            \Yii::$app->response->statusCode = 422;
+            return  [
+                'errorProduct' => $model->getErrors(),
+                'errorDebt' => $model->getErrors()
+            ];
+        }
 
         return true;
     }
