@@ -11,6 +11,9 @@ use common\models\User;
  */
 class UserSearch extends User
 {
+
+    public $name;
+
     /**
      * {@inheritdoc}
      */
@@ -18,6 +21,7 @@ class UserSearch extends User
     {
         return [
             [['id', 'role', 'status', 'created_at', 'updated_at', 'parent_id'], 'integer'],
+            [['name'], 'string'],
             [['username', 'auth_key', 'password_hash', 'password', 'password_reset_token', 'token', 'verification_token'], 'safe'],
         ];
     }
@@ -77,6 +81,11 @@ class UserSearch extends User
             ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
             ->andFilterWhere(['like', 'token', $this->token])
             ->andFilterWhere(['like', 'verification_token', $this->verification_token]);
+
+        if ($this->name){
+            $query->leftJoin('user_detail ud', 'user.id=ud.user_id')
+                ->andFilterWhere(['like','first_name', $this->name]);
+        }
 
         return $dataProvider;
     }

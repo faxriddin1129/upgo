@@ -26,6 +26,7 @@ class m230326_061238_create_order_table extends Migration
             'payment_type_id' => $this->integer(),
             'cashback' => $this->integer(),
             'delivery_time' => $this->integer(),
+            'date' => $this->string(),
             'total_price' => $this->float(),
             'debt' => $this->float(),
             'pay_status' => $this->integer(),

@@ -60,6 +60,7 @@ class OrderForm extends Model
         $model->pay_status = Order::STATUS_DEBTOR;
         $model->status = Order::STATUS_NEW;
         $model->debt = Order::DEBT_ACTIVE;
+        $model->date = date('Y-m-d');
 
         if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){
             $model->diller_id = \Yii::$app->user->id;

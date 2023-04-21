@@ -27,6 +27,14 @@ use yii\behaviors\TimestampBehavior;
 class WorkingDays extends \yii\db\ActiveRecord
 {
 
+    const Mon = 1;
+    const Tues = 2;
+    const Wed = 3;
+    const Thurs = 4;
+    const Fri = 5;
+    const Sat = 6;
+    const Sun = 7;
+
     public function behaviors()
     {
         return [

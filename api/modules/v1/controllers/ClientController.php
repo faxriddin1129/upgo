@@ -55,15 +55,35 @@ class ClientController extends CrudController
 
     public function actionIndex()
     {
-        $search = new ClientSearch(['user_id' => \Yii::$app->user->id]);
-        $dataProvider = $search->search(\Yii::$app->request->queryParams);
+        $dataProvider = [];
 
+        $search = new ClientSearch(['user_id' => \Yii::$app->user->id]);
+        if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){
+            $search = new ClientSearch(['user_id' => \Yii::$app->user->id]);
+        }
+        $search = new ClientSearch(['user_id' => \Yii::$app->user->id]);
+        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+            $search = new ClientSearch(['user_id' => \Yii::$app->user->identity['parent_id']]);
+        }
+
+
+        $dataProvider = $search->search(\Yii::$app->request->queryParams);
         return $dataProvider;
     }
 
-    /**
-     * @throws NotFoundHttpException
-     */
+
+    public function actionDeleted()
+    {
+        $data = [];
+        if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){
+            $data = Client::find()->andWhere(['user_id' => \Yii::$app->user->id])->andWhere(['status' => Client::STATUS_DELETED])->all();
+        }
+        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+            $data = Client::find()->andWhere(['user_id' => \Yii::$app->user->identity['parent_id']])->andWhere(['status' => Client::STATUS_DELETED])->all();
+        }
+        return $data;
+    }
+
     public function actionDelete($id, $text){
         $model  = Client::findOne(['id' => $id, 'status' => Client::STATUS_ACTIVE]);
         if (!$model){

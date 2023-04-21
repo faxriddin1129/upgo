@@ -171,6 +171,9 @@ class Client extends ActiveRecord
         return [
             'diller' => function($model){
                 return $model->user->userDetail;
+            },
+            'debt' => function($model){
+                return Order::find()->andWhere(['client_id' => $model->id])->andWhere(['debt' => Order::DEBT_ACTIVE])->all();
             }
         ];
     }

@@ -219,6 +219,20 @@ class Module extends \yii\base\Module
 
                 'OPTIONS <id:\d+>/<text:>' => 'options',
                 'DELETE <id:\d+>/<text:>' => 'delete',
+
+                'OPTIONS deleted' => 'options',
+                'GET deleted' => 'deleted',
+            ]
+        ],
+
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'v1/statistics',
+            'pluralize' => false,
+            'patterns' => [
+                'OPTIONS <action>' => 'options',
+                'OPTIONS' => 'options',
+                'GET' => 'index',
             ]
         ],
 
@@ -236,6 +250,24 @@ class Module extends \yii\base\Module
                 'GET <id:\d+>' => 'view',
                 'PUT <id:\d+>' => 'update',
                 'DELETE <id:\d+>' => 'delete',
+
+                'OPTIONS <id:\d+>/statistics' => 'options',
+                'GET <id:\d+>/statistics' => 'statistics',
+
+                'OPTIONS <id:\d+>/salary' => 'options',
+                'GET <id:\d+>/salary' => 'salary',
+
+                'OPTIONS <id:\d+>/work-days' => 'options',
+                'GET <id:\d+>/work-days' => 'work-days',
+
+                'OPTIONS <id:\d+>/work-days-all' => 'options',
+                'GET <id:\d+>/work-days-all' => 'work-days-all',
+
+                'OPTIONS <id:\d+>/work-create' => 'options',
+                'GET <id:\d+>/work-create' => 'work-create',
+
+                'OPTIONS <id:\d+>/work-delete' => 'options',
+                'GET <id:\d+>/work-delete' => 'work-delete',
             ]
         ],
 
