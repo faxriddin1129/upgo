@@ -69,22 +69,6 @@ class OrderSearch extends Order
             return $dataProvider;
         }
 
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'client_id' => $this->client_id,
-            'user_id' => $this->user_id,
-            'diller_id' => $this->diller_id,
-            'payment_type_id' => $this->payment_type_id,
-            'cashback' => $this->cashback,
-            'delivery_time' => $this->delivery_time,
-            'total_price' => $this->total_price,
-            'debt' => $this->debt,
-            'pay_status' => $this->pay_status,
-            'get_price' => $this->get_price,
-            'status' => $this->status,
-        ]);
-
 
         if ($this->start and $this->end){
             $query->andWhere(['>=', 'created_at', $this->start])->andWhere(['<', 'created_at', $this->end]);
@@ -107,6 +91,22 @@ class OrderSearch extends Order
             $query->leftJoin('client c', 'c.id=order.client_id');
             $query->andFilterWhere(['like', 'region_id', $this->region_id]);
         }
+
+        // grid filtering conditions
+        $query->andFilterWhere([
+            'id' => $this->id,
+            'client_id' => $this->client_id,
+            'order.user_id' => $this->user_id,
+            'diller_id' => $this->diller_id,
+            'payment_type_id' => $this->payment_type_id,
+            'cashback' => $this->cashback,
+            'delivery_time' => $this->delivery_time,
+            'total_price' => $this->total_price,
+            'debt' => $this->debt,
+            'pay_status' => $this->pay_status,
+            'get_price' => $this->get_price,
+            'status' => $this->status,
+        ]);
 
 
 

@@ -268,6 +268,9 @@ class Module extends \yii\base\Module
 
                 'OPTIONS <id:\d+>/work-delete' => 'options',
                 'GET <id:\d+>/work-delete' => 'work-delete',
+
+                'OPTIONS orders' => 'options',
+                'GET orders' => 'orders',
             ]
         ],
 

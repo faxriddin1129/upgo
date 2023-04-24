@@ -47,6 +47,36 @@ class EmployeeController extends CrudController
         return $dataProvider;
     }
 
+    public function actionOrders()
+    {
+
+        $data = [];
+        $i = 0;
+        if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){
+            $search = User::find()->andWhere(['role' => User::ROLE_SUP_DILLER, 'parent_id' => \Yii::$app->user->id])->all();
+        }
+
+        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+            $search = User::find()->andWhere(['role' => User::ROLE_SUP_DILLER, 'parent_id' => \Yii::$app->user->identity['parent_id']])->all();
+        }
+
+
+        foreach ($search as $user){
+
+            if (Order::findOne(['user_id' => $user['id']])){
+                $data[$i++] = $user;
+            }
+
+        }
+
+        if (Order::findOne(['user_id' => \Yii::$app->user->id])){
+            $data[$i++] = \Yii::$app->user->identity;
+        }
+
+
+        return $data;
+    }
+
     public function actionCreate(){
         $queryParams = \Yii::$app->getRequest()->getBodyParams();
         $model = new EmployeeForm();

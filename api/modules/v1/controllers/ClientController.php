@@ -47,7 +47,11 @@ class ClientController extends CrudController
 
     public function actionCreate(){
         $requestParams = \Yii::$app->getRequest()->getBodyParams();
-        $model = new Client(['user_id' => \Yii::$app->user->id, 'status' => Client::STATUS_ACTIVE]);
+        $user_id = \Yii::$app->user->id;
+        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+            $user_id = \Yii::$app->user->identity['parent_id'];
+        }
+        $model = new Client(['user_id' => $user_id, 'status' => Client::STATUS_ACTIVE]);
         $model->setAttributes($requestParams);
         $model->save();
         return $model;
