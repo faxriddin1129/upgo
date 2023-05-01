@@ -11,6 +11,7 @@ use common\models\StockProduct;
 use common\models\User;
 use yii\base\Model;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 
 class ProductForm extends Model
 {
@@ -81,7 +82,7 @@ class ProductForm extends Model
 
         if ($this->measure_name){
             $measureModel = new Measure();
-            $measureModel->name = $this->category_name;
+            $measureModel->name = $this->measure_name;
             if (!$measureModel->save()){
                 $transaction->rollBack();
                 $this->addErrors($measureModel->getErrors());
@@ -105,7 +106,7 @@ class ProductForm extends Model
             $stock_id = Stock::findOne(['user_id' => \Yii::$app->user->identity['parent_id']]);
         }
         if (!$stock_id){
-            throw new BadRequestHttpException('Permission denied!');
+            throw new BadRequestHttpException('Stock not found!');
         }
         $stockProductModel->product_id = $productModel->id;
         $stockProductModel->stock_id = $stock_id->id;
