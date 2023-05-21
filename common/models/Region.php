@@ -12,6 +12,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $name
  * @property int|null $created_at
  * @property int|null $updated_at
+ * @property int|null $diller_id
  *
  * @property Client[] $clients
  */
@@ -39,9 +40,8 @@ class Region extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['created_at', 'updated_at'], 'integer'],
+            [['created_at', 'updated_at', 'diller_id'], 'integer'],
             [['name'], 'required'],
-            ['name', 'unique', 'targetClass' => '\common\models\Region', 'message' => 'This name has already been taken.'],
             [['name'], 'string', 'max' => 255],
         ];
     }
@@ -68,4 +68,10 @@ class Region extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Client::class, ['region_id' => 'id']);
     }
+
+    public function getDiller()
+    {
+        return $this->hasOne(User::class, ['diller_id' => 'id']);
+    }
+
 }

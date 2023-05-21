@@ -17,6 +17,7 @@ use Yii;
  */
 class OrderProduct extends \yii\db\ActiveRecord
 {
+    public $old_count;
     /**
      * {@inheritdoc}
      */
@@ -31,11 +32,12 @@ class OrderProduct extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'order_id', 'count'], 'required'],
-            [['product_id', 'order_id'], 'integer'],
+            [['product_id', 'order_id', 'count', 'stock_product_id'], 'required'],
+            [['product_id', 'order_id', 'old_count'], 'integer'],
             [['count'], 'number'],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::class, 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::class, 'targetAttribute' => ['product_id' => 'id']],
+            [['stock_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => StockProduct::class, 'targetAttribute' => ['stock_product_id' => 'id']],
         ];
     }
 
@@ -76,7 +78,11 @@ class OrderProduct extends \yii\db\ActiveRecord
     {
         return [
             'id',
+            'product_id' => function($model){
+                return $model->product->id;
+            },
             'count',
+            'stock_product_id',
             'product' => function($model){
                 return $model->product;
             },

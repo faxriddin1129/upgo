@@ -23,6 +23,7 @@ class m230326_055231_create_measure_table extends Migration
             'updated_at' => $this->integer(),
             'created_by' => $this->integer(),
             'updated_by' => $this->integer(),
+            'diller_id' => $this->integer(),
         ]);
 
         // creates index for column `created_by`

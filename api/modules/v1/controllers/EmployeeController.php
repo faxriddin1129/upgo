@@ -12,6 +12,7 @@ use common\models\User;
 use common\models\UserDetail;
 use common\models\WorkingDays;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class EmployeeController extends CrudController
@@ -176,10 +177,16 @@ class EmployeeController extends CrudController
         return $clients;
     }
 
-    public function actionWorkDaysAll($id,$day_id){
+    public function actionWorkDaysAll($id,$day_id=null){
         $user = UserDetail::findOne(['user_id' => $id]);
         if (!$user){
             throw new NotFoundHttpException('User not found!');
+        }
+
+        $clients = [];
+
+        if (\Yii::$app->user->identity['role'] == User::ROLE_ADMIN){
+            throw new ForbiddenHttpException();
         }
 
         if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){

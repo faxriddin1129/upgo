@@ -118,12 +118,14 @@ class StockProduct extends \yii\db\ActiveRecord
     public function fields()
     {
         return [
-            'id',
+            'stock_product_id' => function($model){
+                return $model->id;
+            },
             'product_id',
+            'count',
             'product' => function($model){
                 return $model->product;
             },
-            'count',
             'created_at',
             'updated_at',
             'created_by',

@@ -326,6 +326,9 @@ class Module extends \yii\base\Module
 
                 'OPTIONS <id:\d+>/finish' => 'options',
                 'GET <id:\d+>/finish' => 'finish',
+
+                'OPTIONS <id:\d+>/payment' => 'options',
+                'GET <id:\d+>/payment' => 'payment',
             ]
         ],
 

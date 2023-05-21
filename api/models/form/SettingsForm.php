@@ -42,6 +42,10 @@ class SettingsForm extends \yii\base\Model
         }
 
         $detailModel = UserDetail::findOne(['user_id' => $userModel->id]);
+        if (!$detailModel){
+            $detailModel = new UserDetail();
+            $detailModel->user_id = \Yii::$app->user->id;
+        }
         $detailModel->legal_name = $this->legal_name;
         $detailModel->first_name = $this->first_name;
         $detailModel->last_name = $this->last_name;

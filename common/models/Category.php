@@ -15,10 +15,12 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $updated_at
  * @property int|null $created_by
  * @property int|null $updated_by
+ * @property int|null $diller_id
  *
  * @property User $createdBy
  * @property Product[] $products
  * @property User $updatedBy
+ * @property User $diller
  */
 class Category extends \yii\db\ActiveRecord
 {
@@ -45,12 +47,13 @@ class Category extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
+            [['created_at', 'updated_at', 'created_by', 'updated_by', 'diller_id'], 'integer'],
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
-            [['name'], 'unique', 'targetClass' => '\common\models\Category', 'message' => 'This category has already been taken.'],
+//            [['name'], 'unique', 'targetClass' => '\common\models\Category', 'message' => 'This category has already been taken.'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updated_by' => 'id']],
+            [['diller_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['diller_id' => 'id']],
         ];
     }
 
@@ -77,6 +80,11 @@ class Category extends \yii\db\ActiveRecord
     public function getCreatedBy()
     {
         return $this->hasOne(User::class, ['id' => 'created_by']);
+    }
+
+    public function getDiller()
+    {
+        return $this->hasOne(User::class, ['id' => 'diller_id']);
     }
 
     /**

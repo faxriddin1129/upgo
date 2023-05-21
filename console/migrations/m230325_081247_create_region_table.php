@@ -15,6 +15,7 @@ class m230325_081247_create_region_table extends Migration
         $this->createTable('{{%region}}', [
             'id' => $this->primaryKey(),
             'name' => $this->string(),
+            'diller_id' => $this->integer(),
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
         ]);

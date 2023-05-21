@@ -44,6 +44,7 @@ class Order extends \yii\db\ActiveRecord
     const STATUS_NEW = 0;
     const STATUS_PENDING = 1;
     const STATUS_APPROVED = 2;
+    const STATUS_MAIN_DEBTOR = 3;
 
     const STATUS_PAYED = 1;
     const STATUS_DEBTOR = 0;
@@ -65,6 +66,7 @@ class Order extends \yii\db\ActiveRecord
             self::STATUS_NEW => 'New',
             self::STATUS_PENDING => 'Pending',
             self::STATUS_APPROVED => 'Approved',
+            self::STATUS_MAIN_DEBTOR => 'Main Debtor',
         ];
 
     }
@@ -215,9 +217,12 @@ class Order extends \yii\db\ActiveRecord
         return [
             'id',
             'already_debt' => function($model){
-                $price =  Order::find()->andWhere(['debt' => Order::DEBT_ACTIVE])->andWhere(['diller_id' => $this->diller_id])->sum('update_total_price');
-                $payment =  Order::find()->andWhere(['debt' => Order::DEBT_ACTIVE])->andWhere(['diller_id' => $this->diller_id])->sum('payment_price');
+                $price =  Order::find()->andWhere(['debt' => Order::DEBT_ACTIVE])->andWhere(['client_id' => $this->client_id])->andWhere(['<>', 'id', $model->id])->sum('update_total_price');
+                $payment =  Order::find()->andWhere(['debt' => Order::DEBT_ACTIVE])->andWhere(['client_id' => $this->client_id])->andWhere(['<>', 'id', $model->id])->sum('payment_price');
                 return ($price - $payment);
+            },
+            'products' => function($model){
+                return $model->orderProducts;
             },
             'client_id',
             'client' => function($model){
@@ -252,9 +257,6 @@ class Order extends \yii\db\ActiveRecord
             'status',
             'status_format' => function($model){
                 return self::dropdownStatus()[$model->status];
-            },
-            'products' => function($model){
-                return $model->orderProducts;
             },
             'created_at',
             'updated_at',

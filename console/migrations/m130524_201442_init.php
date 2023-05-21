@@ -71,15 +71,15 @@ class m130524_201442_init extends Migration
     public function down()
     {
 
-        // drops foreign key for table `{{%user}}`
-        $this->dropForeignKey(
-            '{{%fk-user_parent_id}}',
-            '{{%user}}'
-        );
-
         // drops index for column `user_id`
         $this->dropIndex(
             '{{%idx-user-parent_id}}',
+            '{{%user}}'
+        );
+
+        // drops foreign key for table `{{%user}}`
+        $this->dropForeignKey(
+            '{{%fk-user_parent_id}}',
             '{{%user}}'
         );
 

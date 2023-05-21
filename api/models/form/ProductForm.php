@@ -70,7 +70,12 @@ class ProductForm extends Model
 
         if ($this->category_name){
             $categoryModel = new Category();
+            $diller_id = \Yii::$app->user->id;
+            if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+                $diller_id = \Yii::$app->user->identity['parent_id'];
+            }
             $categoryModel->name = $this->category_name;
+            $categoryModel->diller_id = $diller_id;
             if (!$categoryModel->save()){
                 $transaction->rollBack();
                 $this->addErrors($categoryModel->getErrors());
@@ -83,6 +88,11 @@ class ProductForm extends Model
         if ($this->measure_name){
             $measureModel = new Measure();
             $measureModel->name = $this->measure_name;
+            $diller_id = \Yii::$app->user->id;
+            if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+                $diller_id = \Yii::$app->user->identity['parent_id'];
+            }
+            $measureModel->diller_id = $diller_id;
             if (!$measureModel->save()){
                 $transaction->rollBack();
                 $this->addErrors($measureModel->getErrors());

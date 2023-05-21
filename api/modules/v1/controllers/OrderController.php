@@ -81,12 +81,37 @@ class OrderController extends CrudController
             throw new NotFoundHttpException('Order not found!');
         }
 
+//        $model->payment_price = $model->update_total_price;
+            $model->status = Order::STATUS_APPROVED;
+//        $model->debt = Order::DEBT_INACTIVE;
+
+//        $modelDebt = DebtKill::findOne(['order_id' => $model->id]);
+//        $modelDebt->debt_price = 0;
+
+        if (!$model->save()){
+            \Yii::$app->response->statusCode = 422;
+            return  [
+                'errorProduct' => $model->getErrors(),
+                'errorDebt' => $model->getErrors()
+            ];
+        }
+
+        return true;
+    }
+
+    public function actionPayment($id)
+    {
+        $model = Order::findOne(['id' => $id]);
+        if (!$model){
+            throw new NotFoundHttpException('Order not found!');
+        }
+
         $model->payment_price = $model->update_total_price;
-        $model->status = Order::STATUS_APPROVED;
         $model->debt = Order::DEBT_INACTIVE;
+        $model->status = Order::STATUS_MAIN_DEBTOR;
 
         $modelDebt = DebtKill::findOne(['order_id' => $model->id]);
-        $modelDebt->debt_price = 0;
+        $modelDebt->updated_at = time();
 
         if (!$modelDebt->save() or !$model->save()){
             \Yii::$app->response->statusCode = 422;

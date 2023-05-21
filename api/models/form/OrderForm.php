@@ -8,6 +8,7 @@ use common\models\Order;
 use common\models\OrderProduct;
 use common\models\PaymentType;
 use common\models\Product;
+use common\models\StockProduct;
 use common\models\User;
 use yii\base\Model;
 use yii\db\Exception;
@@ -41,6 +42,11 @@ class OrderForm extends Model
         ];
     }
 
+    /**
+     * @throws Exception
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     */
     public function save(){
         if (!$this->validate()){
             return false;
@@ -58,6 +64,7 @@ class OrderForm extends Model
         $model->cashback = $this->cashback;
         $model->delivery_time = $this->delivery_time;
         $model->pay_status = Order::STATUS_DEBTOR;
+        $model->payment_price = 0;
         $model->status = Order::STATUS_NEW;
         $model->debt = Order::DEBT_ACTIVE;
         $model->date = date('Y-m-d');
@@ -79,6 +86,18 @@ class OrderForm extends Model
             $orderProductModel = new OrderProduct();
             $orderProductModel->order_id = $model->id;
             $orderProductModel->setAttributes($product);
+            //
+            $stock_product = StockProduct::findOne(['id' => $product['stock_product_id'], 'product_id' => $product['product_id']]);
+            if (!$stock_product){
+                throw new NotFoundHttpException('StockProduct not found!');
+            }
+            $stock_product->count = $stock_product->count - $product['count'];
+            if (!$stock_product->save()){
+                $transaction->rollBack();
+                $this->addErrors($stock_product->getErrors());
+                return false;
+            }
+            //
             if (!$orderProductModel->save()){
                 $transaction->rollBack();
                 $this->addErrors($orderProductModel->getErrors());
@@ -139,12 +158,31 @@ class OrderForm extends Model
         $model->payment_type_id = $this->payment_type_id;
         $model->cashback = $this->cashback;
         $model->delivery_time = $this->delivery_time;
+        $model->status = Order::STATUS_MAIN_DEBTOR;
         if (!$model->save()){
             $transaction->rollBack();
             $this->addErrors($model->getErrors());
             return false;
         }
 
+        // set old product
+        foreach ($this->products as $product) {
+            if (!array_key_exists('stock_product_id',$product)){
+                throw new BadRequestHttpException('stock_product_id required');
+            }
+            $stockProductRefresh = StockProduct::findOne(['id' => $product['stock_product_id']]);
+            if (!$stockProductRefresh){
+                throw new NotFoundHttpException('Stock Product not found!');
+            }
+
+            $stockProductRefresh->count += $product['old_count'];
+
+            if (!$stockProductRefresh->save()){
+                $transaction->rollBack();
+                $this->addErrors($stockProductRefresh->getErrors());
+                return false;
+            }
+        }
 
         foreach ($this->products as $product) {
             $orderProductModel = OrderProduct::findOne(['id' => $product['id']]);
@@ -153,6 +191,20 @@ class OrderForm extends Model
             }
             $orderProductModel->order_id = $model->id;
             $orderProductModel->setAttributes($product);
+
+            //
+            $stock_product = StockProduct::findOne(['id' => $product['stock_product_id']]);
+            if (!$stock_product){
+                throw new NotFoundHttpException('StockProduct not found!');
+            }
+            $stock_product->count -= $product['count'];
+            if (!$stock_product->save()){
+                $transaction->rollBack();
+                $this->addErrors($stock_product->getErrors());
+                return false;
+            }
+            //
+
             if (!$orderProductModel->save()){
                 $transaction->rollBack();
                 $this->addErrors($orderProductModel->getErrors());
@@ -162,8 +214,8 @@ class OrderForm extends Model
 
         $get_price = 0;
         $total_price = 0;
-        $productsOreder = OrderProduct::find()->andWhere(['order_id' => $model->id])->asArray()->all();
-        foreach ($productsOreder as $product) {
+        $productsOrder = OrderProduct::find()->andWhere(['order_id' => $model->id])->asArray()->all();
+        foreach ($productsOrder as $product) {
             $pro = Product::findOne(['id' => $product['product_id']]);
             $total_price += ($pro->sell_price * $product['count']);
             $get_price += ($pro->get_price * $product['count']);

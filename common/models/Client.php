@@ -173,7 +173,10 @@ class Client extends ActiveRecord
                 return $model->user->userDetail;
             },
             'debt' => function($model){
-                return Order::find()->andWhere(['client_id' => $model->id])->andWhere(['debt' => Order::DEBT_ACTIVE])->all();
+                return Order::find()->andWhere(['client_id' => $model->id])
+                    ->andWhere(['debt' => Order::DEBT_ACTIVE])
+                    ->andWhere(['>=', 'status', Order::STATUS_APPROVED])
+                    ->all();
             }
         ];
     }

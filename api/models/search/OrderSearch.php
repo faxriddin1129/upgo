@@ -17,6 +17,8 @@ class OrderSearch extends Order
     public  $agent;
     public  $region_id;
     public  $legal_name;
+    public  $settlement;
+    public  $settlement2;
 
     /**
      * {@inheritdoc}
@@ -26,7 +28,7 @@ class OrderSearch extends Order
         return [
             [['id', 'client_id', 'user_id', 'payment_type_id', 'diller_id', 'cashback', 'delivery_time', 'pay_status', 'status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
             [['total_price', 'debt', 'get_price'], 'number'],
-            [['start', 'end', 'region_id'], 'integer'],
+            [['start', 'end', 'region_id', 'payment_price', 'settlement', 'settlement2'], 'integer'],
             [['agent', 'legal_name'], 'string'],
         ];
     }
@@ -99,6 +101,7 @@ class OrderSearch extends Order
             'order.user_id' => $this->user_id,
             'diller_id' => $this->diller_id,
             'payment_type_id' => $this->payment_type_id,
+            'payment_price' => $this->payment_price,
             'cashback' => $this->cashback,
             'delivery_time' => $this->delivery_time,
             'total_price' => $this->total_price,
@@ -107,6 +110,14 @@ class OrderSearch extends Order
             'get_price' => $this->get_price,
             'status' => $this->status,
         ]);
+
+        if($this->settlement){
+            $query->andWhere(['>', 'payment_price', 0]);
+        }
+
+        if($this->settlement2){
+            $query->andWhere(['>=', 'status', 2 ]);
+        }
 
 
 
