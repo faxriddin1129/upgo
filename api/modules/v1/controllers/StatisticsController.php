@@ -21,14 +21,14 @@ class StatisticsController extends ApiController
         return $parent;
     }
 
-    public function actionIndex($start,$end)
+    public function actionIndex($start, $end)
     {
         $id = 0;
         $date = [];
-        if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER){
+        if (\Yii::$app->user->identity['role'] == User::ROLE_DILLER) {
             $id = \Yii::$app->user->id;
         }
-        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER){
+        if (\Yii::$app->user->identity['role'] == User::ROLE_SUP_DILLER) {
             $id = \Yii::$app->user->identity['parent_id'];
         }
 
@@ -45,10 +45,52 @@ class StatisticsController extends ApiController
             ->andWhere(['<=', 'created_at', $end])
             ->sum('get_price');
 
+        $f =  Order::STATUS_APPROVED;
+        $sql = "SELECT client_id,c.full_name, sum(update_total_price) as amount FROM `order`
+        LEFT JOIN client c on `order`.client_id = c.id
+        WHERE diller_id = {$id} AND `order`.status={$f} AND created_at >= {$start} AND created_at <= {$end}
+        group by client_id";
+        $activeClients = \Yii::$app->db->createCommand($sql)->queryAll();
+
+        $orders = Order::find()
+            ->andWhere(['diller_id' => $id])
+            ->andWhere(['status' => Order::STATUS_APPROVED])
+            ->andWhere(['>=', 'created_at', $start])
+            ->andWhere(['<=', 'created_at', $end])
+            ->all();
+
+
+
+        $_sql = "SELECT SUM(op.count) as count, sum(op.product_price) as price, op.product_id as product_id, p.name FROM order_product as op
+LEFT JOIN `order` o on o.id = op.order_id
+LEFT JOIN product p on op.product_id = p.id
+WHERE  o.diller_id = {$id} AND o.status={$f}  AND o.created_at >= {$start} AND o.created_at <= {$end}
+GROUP BY op.product_id";
+
+        $expen = \Yii::$app->db->createCommand($_sql)->queryAll();
+        $newExpen = [];
+        $jk = 0;
+        $allCount = 0;
+        foreach ($expen as $item){
+            $allCount += $item['count'];
+        }
+        foreach ($expen as $item){
+            $newExpen[$jk]['count'] = $item['count'];
+            $newExpen[$jk]['price'] = $item['price'];
+            $newExpen[$jk]['name'] = $item['name'];
+            $newExpen[$jk]['expen'] = round(( (100* $item['count']) / ($allCount)  ),3).' %';
+            $jk++;
+        }
+
+
+
+
+
+
 
         $i = 0;
-        while ($start <= $end){
-            $moment = date('Y-m-d',$start);
+        while ($start <= $end) {
+            $moment = date('Y-m-d', $start);
             $date[$i]['date'] = $moment;
             $sale = Order::find()
                 ->andWhere(['diller_id' => $id])
@@ -68,12 +110,14 @@ class StatisticsController extends ApiController
             $i++;
         }
 
-
         return [
             'sale_price' => (int)$orderSalesSum,
             'get_price' => (int)$orderGetSum,
             'benefit_price' => ($orderSalesSum - $orderGetSum),
-            'date' => $date
+            'activeClients' => $activeClients,
+            'date' => $date,
+            'expen' => $newExpen,
+            'orders' => $orders,
         ];
     }
 

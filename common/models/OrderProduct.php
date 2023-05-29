@@ -11,6 +11,7 @@ use Yii;
  * @property int|null $product_id
  * @property float|null $count
  * @property int|null $order_id
+ * @property int|null $product_price
  *
  * @property Order $order
  * @property Product $product
@@ -34,7 +35,7 @@ class OrderProduct extends \yii\db\ActiveRecord
         return [
             [['product_id', 'order_id', 'count', 'stock_product_id'], 'required'],
             [['product_id', 'order_id', 'old_count'], 'integer'],
-            [['count'], 'number'],
+            [['count', 'product_price'], 'number'],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::class, 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::class, 'targetAttribute' => ['product_id' => 'id']],
             [['stock_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => StockProduct::class, 'targetAttribute' => ['stock_product_id' => 'id']],

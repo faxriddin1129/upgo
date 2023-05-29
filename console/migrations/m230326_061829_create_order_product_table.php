@@ -22,6 +22,7 @@ class m230326_061829_create_order_product_table extends Migration
             'count' => $this->float(),
             'order_id' => $this->integer(),
             'stock_product_id' => $this->integer(),
+            'product_price' => $this->float(),
         ]);
 
         // creates index for column `product_id`

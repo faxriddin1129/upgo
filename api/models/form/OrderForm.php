@@ -85,6 +85,7 @@ class OrderForm extends Model
         foreach ($this->products as $product) {
             $orderProductModel = new OrderProduct();
             $orderProductModel->order_id = $model->id;
+            $orderProductModel->product_price = Product::findOne(['id' => $product['product_id']])->sell_price;
             $orderProductModel->setAttributes($product);
             //
             $stock_product = StockProduct::findOne(['id' => $product['stock_product_id'], 'product_id' => $product['product_id']]);
@@ -190,6 +191,7 @@ class OrderForm extends Model
                 throw new NotFoundHttpException('Order Product not found!');
             }
             $orderProductModel->order_id = $model->id;
+            $orderProductModel->product_price = Product::findOne(['id' => $product['product_id']])->sell_price;
             $orderProductModel->setAttributes($product);
 
             //
