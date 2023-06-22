@@ -1,0 +1,1 @@
+import{A as e}from"./index-e79a3e3f.js";const i=e("filterData",{state:()=>({locations:{checkAll:!0,isIndeterminate:!1,checkedCities:[],cities:[]},categories:{checkAll:!0,isIndeterminate:!1,checkedCities:[],cities:[]}})});export{i as u};

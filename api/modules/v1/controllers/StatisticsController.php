@@ -46,9 +46,10 @@ class StatisticsController extends ApiController
             ->sum('get_price');
 
         $f =  Order::STATUS_APPROVED;
-        $sql = "SELECT client_id,c.full_name, sum(update_total_price) as amount FROM `order`
+        $sql = "SELECT client_id,c.full_name, sum(update_total_price) as amount, c.legal_name, c.location, f.url as url, c.name as name FROM `order`
         LEFT JOIN client c on `order`.client_id = c.id
-        WHERE diller_id = {$id} AND `order`.status={$f} AND created_at >= {$start} AND created_at <= {$end}
+        LEFT JOIN file f on f.id = c.file_id
+        WHERE diller_id = {$id} AND `order`.status={$f} AND `order`.created_at >= {$start} AND `order`.created_at <= {$end}
         group by client_id";
         $activeClients = \Yii::$app->db->createCommand($sql)->queryAll();
 
